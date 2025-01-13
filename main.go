@@ -19,7 +19,6 @@ import (
 // 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 // 	defer cancel()
-// 	connectionString := "mongodb://url-manager:pA9UUH0klrDEklpEK4jP75tjFSfdbzJkUkD5rmeTKAnbne9EjI1TvpG24D7EFVG0f1qjwV1swT0FACDbETcySQ==@url-manager.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@url-manager@"
 
 // 	var err error
 
