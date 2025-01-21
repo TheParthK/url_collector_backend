@@ -1,37 +1,16 @@
 package main
 
 import (
-	// "context"
+	"database/sql"
 	"errors"
 	"fmt"
-	// "log"
-	"net/http"
-	// "time"
-
 	"github.com/gin-gonic/gin"
-	// "go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo/options"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
+	"helpers"
+	"log"
+	"net/http"
 )
-
-// CONNECTING DB
-
-// func connectToDB() {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-
-// 	defer cancel()
-
-// 	var err error
-
-// 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionString))
-
-// 	if err != nil {
-// 		log.Fatalf("Failed to connect to DB: %v", err)
-// 	}
-
-// 	fmt.Println("Connected to DB successfully")
-// }
-
-// BACKEND
 
 type URL struct {
 	ID    string `json:"id"`
@@ -93,20 +72,66 @@ func getURLbyID(c *gin.Context) {
 
 }
 
+// mai nhi kr rhA delete, db connect krne k baad krunga
+
 func main() {
 
-	// connectToDB()
+	dotenvErr := godotenv.Load(".env")
 
-	router := gin.Default()
+	if dotenvErr != nil {
+		log.Fatal("Error loading .env file %f", dotenvErr)
+	}
 
-	router.GET("/", health)
+	// sample query for getting all users
+	helpers.openDB("mysql", func(db *sql.DB) {
+		sqlQuery := "SELECT * FROM users"
+		rows, err := db.Query(sqlQuery)
 
-	router.GET("/urls", getAllURLS)
+		if err != nil {
+			fmt.Printf("Error with db: %s", err)
+		}
 
-	router.GET("/urls/:i", getURLbyID)
+		defer rows.Close()
 
-	router.POST("/urls", addURL)
+		uid, user_name := 0, ""
+		for rows.Next() {
+			err = rows.Scan(&uid, &user_name)
+			if err == nil {
+				fmt.Printf("uid: %d\tuser_name: %s\n", uid, user_name)
+			}
+		}
+	})
 
-	router.Run("localhost:8080")
+	// getting all cards
+	helpers.openDB("mysql", func(db *sql.DB) {
+		sqlQuery := "SELECT * FROM cards"
+		rows, err := db.Query(sqlQuery)
+
+		if err != nil {
+			fmt.Printf("Error with db: %s", err)
+		}
+
+		defer rows.Close()
+
+		cid, uid, title, description, category, url := 0, 0, "", "", "", ""
+		for rows.Next() {
+			err = rows.Scan(&cid, &uid, &title, &description, &category, &url)
+			if err == nil {
+				fmt.Printf("cid: %d, uid: %d, title: %s, description: %s, category: %s, url: %s\n", cid, uid, title, description, category, url)
+			}
+		}
+	})
+
+	// router := gin.Default()
+
+	// router.GET("/", health)
+
+	// router.GET("/urls", getAllURLS)
+
+	// router.GET("/urls/:i", getURLbyID)
+
+	// router.POST("/urls", addURL)
+
+	// router.Run("localhost:8080")
 
 }
