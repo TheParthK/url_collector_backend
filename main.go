@@ -1,13 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/TheParthK/url_collector_backend/helpers"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
-	"helpers"
 	"log"
 	"net/http"
 )
@@ -81,46 +80,11 @@ func main() {
 	if dotenvErr != nil {
 		log.Fatal("Error loading .env file %f", dotenvErr)
 	}
-
 	// sample query for getting all users
-	helpers.openDB("mysql", func(db *sql.DB) {
-		sqlQuery := "SELECT * FROM users"
-		rows, err := db.Query(sqlQuery)
-
-		if err != nil {
-			fmt.Printf("Error with db: %s", err)
-		}
-
-		defer rows.Close()
-
-		uid, user_name := 0, ""
-		for rows.Next() {
-			err = rows.Scan(&uid, &user_name)
-			if err == nil {
-				fmt.Printf("uid: %d\tuser_name: %s\n", uid, user_name)
-			}
-		}
-	})
+	helpers.QueryAllUsers()
 
 	// getting all cards
-	helpers.openDB("mysql", func(db *sql.DB) {
-		sqlQuery := "SELECT * FROM cards"
-		rows, err := db.Query(sqlQuery)
-
-		if err != nil {
-			fmt.Printf("Error with db: %s", err)
-		}
-
-		defer rows.Close()
-
-		cid, uid, title, description, category, url := 0, 0, "", "", "", ""
-		for rows.Next() {
-			err = rows.Scan(&cid, &uid, &title, &description, &category, &url)
-			if err == nil {
-				fmt.Printf("cid: %d, uid: %d, title: %s, description: %s, category: %s, url: %s\n", cid, uid, title, description, category, url)
-			}
-		}
-	})
+	helpers.QueryAllCards()
 
 	// router := gin.Default()
 
